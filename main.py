@@ -24,15 +24,6 @@ def download_album(ytmusic, query):
     # foobar2000 can start reading the files:
     temp_dir = tempfile.mkdtemp()
 
-    # Download album cover:
-    # Thumbnails are sorted, with highest resolution last, so pick that one:
-    thumbnail_url = album['thumbnails'][-1]['url']
-    thumbnail_response = requests.get(thumbnail_url, stream=True)
-    if thumbnail_response.status_code == 200:
-        thumbnail_path = pathlib.Path(temp_dir, 'cover.jpg')
-        with open(thumbnail_path, 'wb') as f:
-            shutil.copyfileobj(thumbnail_response.raw, f)
-
     # Create output directory:
     music_dir = pathlib.Path('D:\\Music')
     artist_dir = music_dir / album_artist
@@ -41,6 +32,15 @@ def download_album(ytmusic, query):
     album_dir = artist_dir / album_name
     if not album_dir.exists():
         os.mkdir(album_dir)
+
+    # Download album cover:
+    # Thumbnails are sorted, with highest resolution last, so pick that one:
+    thumbnail_url = album['thumbnails'][-1]['url']
+    thumbnail_response = requests.get(thumbnail_url, stream=True)
+    if thumbnail_response.status_code == 200:
+        thumbnail_path = pathlib.Path(album_dir, 'cover.jpg')
+        with open(thumbnail_path, 'wb') as f:
+            shutil.copyfileobj(thumbnail_response.raw, f)
 
 
     with YoutubeDL({
