@@ -63,3 +63,4 @@ def download_album(browse_id, ytmusic=YTMusic()):
                     pass
 
     print(f'Downloaded album to {album_dir}')
+    return album
