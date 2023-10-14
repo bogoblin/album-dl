@@ -39,16 +39,15 @@ def get_album():
 
 @app.route("/download", methods=['POST'])
 def download():
-    track_options = {}
-    for key, value in request.form.items():
-        try:
-            action, videoId = key.split('.', 2)
-        except ValueError:
-            continue
-
-        track = track_options.get(videoId, {})
-        track[action] = value
-        track_options[videoId] = track
+    track_options = []
+    for i in range(1, 1000):
+        if f'enable.{i}' not in request.form:
+            break
+        track_options.append({
+            'enable': request.form.get(f'enable.{i}'),
+            'track-number': request.form.get(f'track-number.{i}'),
+            'title': request.form.get(f'title.{i}'),
+        })
 
     album = downloader.download_album(request.form, track_options)
-    return album
+    return 'Downloaded'

@@ -1,6 +1,5 @@
 import tempfile
 from yt_dlp import YoutubeDL
-from ytmusicapi import YTMusic
 import pathlib
 import requests
 import shutil
@@ -44,24 +43,19 @@ def download_album(album_options, track_options):
     }) as ydl:
         info = ydl.extract_info(album_options['audioPlaylistId'])
         total_tracks = len(info['entries'])
-        for entry in info['entries']:
-            video_id = entry['id']
-            options_for_track = track_options[video_id]
-            track_number = options_for_track['track-number']
+        for options_for_track, entry in zip(track_options, info['entries']):
+            track_number = int(options_for_track['track-number'])
             for download in entry['requested_downloads']:
                 file_path = download['filepath']
-                try:
-                    mp3 = MP3(file_path, ID3=EasyID3)
-                    mp3['tracknumber'] = f'{track_number + 1}/{total_tracks}'
-                    mp3['albumartist'] = album_artist
-                    mp3['artist'] = album_artist
-                    mp3['date'] = f'{album_options["year"]}'
-                    mp3['title'] = options_for_track['title']
-                    mp3.save()
-                    shutil.move(file_path, album_dir)
-                    break
-                except:
-                    pass
+                mp3 = MP3(file_path, ID3=EasyID3)
+                mp3['tracknumber'] = f'{track_number}/{total_tracks}'
+                mp3['albumartist'] = album_artist
+                mp3['artist'] = album_artist
+                mp3['date'] = f'{album_options["year"]}'
+                mp3['title'] = options_for_track['title']
+                mp3.save()
+                shutil.move(file_path, album_dir)
+                break
 
         print(f'Downloaded album to {album_dir}')
         return info
