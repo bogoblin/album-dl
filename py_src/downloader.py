@@ -9,10 +9,9 @@ from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
 
 
-def download_album(browse_id, ytmusic=YTMusic()):
-    album = ytmusic.get_album(browse_id)
-    album_artist = ', '.join([artist['name'] for artist in album['artists']])
-    album_name = album['title']
+def download_album(album_options, track_options):
+    album_artist = album_options['artist']
+    album_name = album_options['title']
 
     # We create a temporary directory to work in, otherwise
     # foobar2000 can start reading the files:
@@ -23,9 +22,7 @@ def download_album(browse_id, ytmusic=YTMusic()):
     album_dir = music_dir / album_artist / album_name
     os.makedirs(album_dir, 0o777, True)
 
-    # Download album cover:
-    # Thumbnails are sorted, with highest resolution last, so pick that one:
-    thumbnail_response = requests.get(album['thumbnails'][-1]['url'], stream=True)
+    thumbnail_response = requests.get(album_options['thumbnailUrl'], stream=True)
     if thumbnail_response.status_code == 200:
         with open(album_dir / 'cover.jpg', 'wb') as f:
             shutil.copyfileobj(thumbnail_response.raw, f)
@@ -45,9 +42,12 @@ def download_album(browse_id, ytmusic=YTMusic()):
         ],
         # 'keepvideo': True
     }) as ydl:
-        info = ydl.extract_info(album['audioPlaylistId'])
+        info = ydl.extract_info(album_options['audioPlaylistId'])
         total_tracks = len(info['entries'])
-        for track_number, entry in enumerate(info['entries']):
+        for entry in info['entries']:
+            video_id = entry['videoId']
+            options_for_track = track_options[video_id]
+            track_number = options_for_track['track-number']
             for download in entry['requested_downloads']:
                 file_path = download['filepath']
                 try:
@@ -55,12 +55,13 @@ def download_album(browse_id, ytmusic=YTMusic()):
                     mp3['tracknumber'] = f'{track_number + 1}/{total_tracks}'
                     mp3['albumartist'] = album_artist
                     mp3['artist'] = album_artist
-                    mp3['date'] = f'{album["year"]}'
+                    mp3['date'] = f'{album_options["year"]}'
+                    mp3['title'] = options_for_track['title']
                     mp3.save()
                     shutil.move(file_path, album_dir)
                     break
                 except:
                     pass
 
-    print(f'Downloaded album to {album_dir}')
-    return album
+        print(f'Downloaded album to {album_dir}')
+        return info

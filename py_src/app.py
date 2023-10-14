@@ -39,7 +39,16 @@ def get_album():
 
 @app.route("/download", methods=['POST'])
 def download():
-    album = request.get_json()
-    browse_id = album['browseId']
-    album = downloader.download_album(browse_id)
+    track_options = {}
+    for key, value in request.form.items():
+        try:
+            action, videoId = key.split('.', 2)
+        except ValueError:
+            continue
+
+        track = track_options.get(videoId, {})
+        track[action] = value
+        track_options[videoId] = track
+
+    album = downloader.download_album(request.form, track_options)
     return album

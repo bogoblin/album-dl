@@ -29,11 +29,9 @@
     <input id="download-location" value="D:\Music">
 </form>
 <hr>
-<form>
+<form hx-get="/search" hx-target="#search-results">
     <label for="search-box">Search albums: </label>
-    <input id="search-box" name="query"
-           hx-get="/search" hx-trigger="keyup changed delay:1s"
-           hx-target="#search-results">
+    <input id="search-box" name="query">
     <button>Search</button>
 </form>
 <ul id="search-results">
