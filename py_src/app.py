@@ -11,9 +11,10 @@ def search():
     query = request.args.get('query', '')
     ytmusic = YTMusic()
     search = ytmusic.search(query, 'albums')
+    output = ''
     for album in search:
-        album['href'] = "/album?browseId="+album['browseId']
-    return search
+        output += f'<li hx-get="/album?browseId={album["browseId"]}" hx-trigger="load"></li>'
+    return output
 
 
 @app.route("/album", methods=['GET'])
