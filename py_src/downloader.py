@@ -46,6 +46,8 @@ def download_album(album_options, track_options):
         for options_for_track, entry in zip(track_options, info['entries']):
             track_number = int(options_for_track['track-number'])
             for download in entry['requested_downloads']:
+                if not options_for_track['enable']:
+                    continue
                 file_path = download['filepath']
                 mp3 = MP3(file_path, ID3=EasyID3)
                 mp3['tracknumber'] = f'{track_number}/{total_tracks}'
