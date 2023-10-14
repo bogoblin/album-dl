@@ -45,7 +45,7 @@ def download_album(album_options, track_options):
         info = ydl.extract_info(album_options['audioPlaylistId'])
         total_tracks = len(info['entries'])
         for entry in info['entries']:
-            video_id = entry['videoId']
+            video_id = entry['id']
             options_for_track = track_options[video_id]
             track_number = options_for_track['track-number']
             for download in entry['requested_downloads']:
