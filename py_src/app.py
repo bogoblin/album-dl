@@ -1,9 +1,16 @@
-from flask import Flask, request
+from flask import Flask, request, send_file
 from ytmusicapi import YTMusic
 
 import downloader
 
-app = Flask(__name__)
+app = Flask(__name__,
+            static_url_path='',
+            static_folder="static")
+
+
+@app.route("/", methods=['GET'])
+def index():
+    return send_file("static/index.html")
 
 
 @app.route("/search", methods=['GET'])
