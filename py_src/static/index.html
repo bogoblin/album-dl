@@ -27,34 +27,17 @@
 <form>
     <label for="download-location">Download to:</label>
     <input id="download-location" value="D:\Music">
-    <hr>
-    <label for="search-box">Search albums: </label>
-    <input id="search-box">
 </form>
-<ul style="padding: 0">
+<hr>
+<form>
+    <label for="search-box">Search albums: </label>
+    <input id="search-box" name="query"
+           hx-get="/search" hx-trigger="keyup changed delay:1s"
+           hx-target="#search-results">
+    <button>Search</button>
+</form>
+<ul id="search-results">
 
-    <li><article class="album">
-        <figure>
-            <img src="../../cover.jpg" alt="album art" height="200">
-        </figure>
-        <div>
-            <h2>Album name <a href="#">edit</a> (1993) <a href="#">edit</a></h2>
-            <h3>by Album artist <a href="#">edit</a></h3>
-            <form>
-                <input type="checkbox" id="trim-suffix">
-                <label for="trim-suffix">Remove common suffixes</label>
-                <details>
-                    <summary>2 Tracks</summary>
-                    <ul>
-                        <li>1. Epic cool song <a href="#">edit</a> <a href="#">delete</a></li>
-                        <li>2. Even cooler song <a href="#">edit</a> <a href="#">delete</a></li>
-                    </ul>
-                </details>
-                <br>
-                <button>Download</button>
-            </form>
-        </div>
-    </article></li>
 </ul>
 
 </body>

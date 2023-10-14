@@ -1,11 +1,14 @@
-from flask import Flask, request, send_file
+from flask import Flask, request, send_file, render_template
 from ytmusicapi import YTMusic
 
 import downloader
 
 app = Flask(__name__,
             static_url_path='',
-            static_folder="static")
+            static_folder="static",
+            template_folder="templates"
+            )
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 @app.route("/", methods=['GET'])
@@ -27,8 +30,11 @@ def search():
 @app.route("/album", methods=['GET'])
 def get_album():
     browse_id = request.args.get('browseId', '')
-    ytmusic = YTMusic()
-    return ytmusic.get_album(browse_id)
+    album = YTMusic().get_album(browse_id)
+    if request.accept_mimetypes.accept_html:
+        return render_template('album.html', album=album)
+
+    return album
 
 
 @app.route("/download", methods=['POST'])
