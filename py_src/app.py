@@ -2,6 +2,7 @@ from flask import Flask, request, send_file, render_template
 from ytmusicapi import YTMusic
 
 import downloader
+import webbrowser
 
 app = Flask(__name__,
             static_url_path='',
@@ -51,3 +52,9 @@ def download():
 
     album = downloader.download_album(request.form, track_options)
     return 'Downloaded'
+
+
+if __name__ == '__main__':
+    url = 'http://127.0.0.1:5000'
+    webbrowser.open(url)
+    app.run()
