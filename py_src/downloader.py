@@ -1,3 +1,4 @@
+import re
 import tempfile
 from yt_dlp import YoutubeDL
 import pathlib
@@ -18,7 +19,10 @@ def download_album(album_options, track_options):
 
     # Create output directory:
     music_dir = pathlib.Path('D:\\Music')
-    album_dir = music_dir / album_artist / album_name
+    album_dir = (music_dir
+                 / sanitize_path_segment(album_artist)
+                 / sanitize_path_segment(album_name)
+                 )
     os.makedirs(album_dir, 0o777, True)
 
     thumbnail_response = requests.get(album_options['thumbnailUrl'], stream=True)
@@ -61,3 +65,8 @@ def download_album(album_options, track_options):
 
         print(f'Downloaded album to {album_dir}')
         return info
+
+
+def sanitize_path_segment(path_segment: str):
+    not_allowed_in_path = re.compile(r"[:\\/<>\"|?*]")
+    return not_allowed_in_path.sub(' ', path_segment)
