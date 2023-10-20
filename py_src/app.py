@@ -1,5 +1,6 @@
 from flask import Flask, request, send_file, render_template
 from ytmusicapi import YTMusic
+from threading import Thread
 
 import downloader
 import webbrowser
@@ -50,8 +51,9 @@ def download():
             'title': request.form.get(f'title.{i}'),
         })
 
-    album = downloader.download_album(request.form, track_options)
-    return 'Downloaded'
+    t = Thread(target=downloader.download_album, args=(request.form, track_options))
+    t.start()
+    return 'Downloading...'
 
 
 if __name__ == '__main__':
