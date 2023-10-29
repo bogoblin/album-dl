@@ -23,7 +23,7 @@ def search():
     query = request.args.get('query', '')
     ytmusic = YTMusic()
     search = ytmusic.search(query, 'albums')
-    output = ''
+    output = f'<h2>Showing {len(search)} results:</h2>\n'
     for album in search:
         output += f'<li hx-get="/album?browseId={album["browseId"]}" hx-trigger="load"></li>'
     return output
@@ -59,4 +59,4 @@ def download():
 if __name__ == '__main__':
     url = 'http://127.0.0.1:5000'
     webbrowser.open(url)
-    app.run()
+    app.run(debug=True)
