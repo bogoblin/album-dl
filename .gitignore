@@ -1,0 +1,4 @@
+/py_src/build/
+/py_src/dist/
+/py_src/app.spec
+/venv/
