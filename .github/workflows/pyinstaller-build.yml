@@ -9,12 +9,12 @@ jobs:
       - name: Package for Windows
         uses: JackMcKew/pyinstaller-action-windows@main
         with:
-          path: py_src
+          path: .
 
       - name: Rename windows exe
-        run: mv py_src/dist/windows/app.exe py_src/dist/windows/album-dl.exe
+        run: mv dist/windows/app.exe dist/windows/album-dl.exe
 
       - uses: actions/upload-artifact@v2
         with:
           name: album-dl-windows
-          path: py_src/dist/windows/album-dl.exe
+          path: dist/windows/album-dl.exe
