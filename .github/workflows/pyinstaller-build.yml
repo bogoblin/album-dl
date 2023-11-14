@@ -11,7 +11,10 @@ jobs:
         with:
           path: py_src
 
-      - uses: actions/upload-artifact@v2
+      - name: Rename windows exe
+        run: mv py_src/dist/windows/app.exe py_src/dist/windows/album-dl.exe
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: album-dl-windows
-          path: py_src/dist/windows
+          files: py_src/dist/windows/album-dl.exe
