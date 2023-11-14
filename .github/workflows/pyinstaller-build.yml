@@ -1,0 +1,17 @@
+name: Build Executable
+on: [push]
+jobs:
+  PyInstaller:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Package for Windows
+        uses: JackMcKew/pyinstaller-action-windows@main
+        with:
+          path: py_src
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: album-dl-windows
+          path: py_src/dist/windows
