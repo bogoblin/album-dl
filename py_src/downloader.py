@@ -8,6 +8,8 @@ import os
 from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
 
+MusicDirectory = ''
+
 
 def download_album(album_options, track_options):
     album_artist = album_options['artist']
@@ -18,7 +20,7 @@ def download_album(album_options, track_options):
     temp_dir = tempfile.mkdtemp()
 
     # Create output directory:
-    music_dir = pathlib.Path('D:\\Music')
+    music_dir = pathlib.Path(MusicDirectory)
     album_dir = (music_dir
                  / sanitize_path_segment(album_artist)
                  / sanitize_path_segment(album_name)

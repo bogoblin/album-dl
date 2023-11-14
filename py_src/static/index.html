@@ -24,16 +24,12 @@
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
 
 <h1>Album stealer 5000</h1>
-<form>
-    <label for="download-location">Download to:</label>
-    <input id="download-location" value="D:\Music">
-</form>
-<hr>
 <form hx-get="/search" hx-target="#search-results">
     <label for="search-box">Search albums: </label>
     <input id="search-box" name="query">
     <button>Search</button>
 </form>
+<hr>
 <ul id="search-results">
 
 </ul>

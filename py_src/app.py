@@ -1,6 +1,8 @@
 from flask import Flask, request, send_file, render_template
 from ytmusicapi import YTMusic
 from threading import Thread
+from tkinter import Tk
+from tkinter.filedialog import askdirectory
 
 import downloader
 import webbrowser
@@ -57,6 +59,8 @@ def download():
 
 
 if __name__ == '__main__':
+    Tk().withdraw()
+    downloader.MusicDirectory = askdirectory(mustexist=True, title="Choose music directory")
     url = 'http://127.0.0.1:5000'
     webbrowser.open(url)
-    app.run(debug=True)
+    app.run()
