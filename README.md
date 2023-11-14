@@ -13,7 +13,7 @@ Feel free to make issues if you find any bugs or anything.
 Currently building for Windows with:
 
 ```shell
-pyinstaller.exe py_src\app.py -F --add-data "py_src\static:static" --add-data "py_src\templates:templates"
+pyinstaller.exe py_src\app.py -F --add-data "py_src\static:static" --add-data "py_src\templates:templates"  --collect-data ytmusicapi
 ```
 
 Version 0.2
