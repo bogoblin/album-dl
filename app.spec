@@ -8,6 +8,7 @@ a = Analysis(
     datas=[('py_src\\static', 'static'), ('py_src\\templates', 'templates')],
     hiddenimports=[],
     hookspath=[],
+    hooksconfig={},
     runtime_hooks=[],
     excludes=[],
     noarchive=False,
