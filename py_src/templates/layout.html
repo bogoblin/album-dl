@@ -22,6 +22,7 @@
 </style>
 <body>
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
 
 <h1>Album stealer 5000</h1>
 <form action="/search" method="get">
@@ -30,7 +31,14 @@
     <button>Search</button>
 </form>
 <hr>
-{% block content %}
-{% endblock %}
+<div>
+    <div id="downloads" hx-ext="ws" ws-connect="/downloads">
+        <ul id="download-list"></ul>
+    </div>
+    <div id="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
 </body>
 </html>

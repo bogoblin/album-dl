@@ -1,4 +1,8 @@
+import time
+
+import simple_websocket.ws
 from flask import Flask, request, send_file, render_template
+from flask_sock import Sock
 from ytmusicapi import YTMusic
 from threading import Thread
 from tkinter import Tk
@@ -7,6 +11,8 @@ from tkinter.filedialog import askdirectory
 import downloader
 import webbrowser
 
+import progress_tracker
+
 app = Flask(__name__,
             static_url_path='',
             static_folder="static",
@@ -14,6 +20,9 @@ app = Flask(__name__,
             )
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
+sock = Sock(app)
+
+progress_tracker.app = app.app_context()
 
 @app.route("/", methods=['GET'])
 def index():
@@ -57,6 +66,22 @@ def download():
     t = Thread(target=downloader.download_album, args=(request.form, track_options))
     t.start()
     return 'Downloading...'
+
+
+@sock.route('/downloads')
+def downloads(web_socket: simple_websocket.ws.Server):
+    next_event_index = 0
+    while web_socket.connected:
+        if len(progress_tracker.events) < next_event_index:
+            continue
+        new_events = progress_tracker.events[next_event_index:]
+        next_event_index = len(progress_tracker.events)
+        for event in new_events:
+            web_socket.send(render_template(
+                "partials/download_event.html",
+                download_event='hello123'
+            ))
+        time.sleep(1)
 
 
 if __name__ == '__main__':

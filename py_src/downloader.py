@@ -7,6 +7,7 @@ import shutil
 import os
 from mutagen.mp3 import MP3
 from mutagen.easyid3 import EasyID3
+import progress_tracker
 
 MusicDirectory = ''
 
@@ -45,6 +46,7 @@ def download_album(album_options, track_options):
                 'preferredcodec': 'mp3',
             }
         ],
+        'progress_hooks': [progress_tracker.process_event]
         # 'keepvideo': True
     }) as ydl:
         info = ydl.extract_info(album_options['audioPlaylistId'])
