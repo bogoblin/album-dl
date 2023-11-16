@@ -19,7 +19,7 @@ class Track:
     enabled: bool
     track_number: int
     title: str
-    latest_download_event: dict
+    latest_download_event: dict | None = None
 
 
 @dataclass

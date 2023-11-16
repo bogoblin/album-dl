@@ -64,7 +64,6 @@ def download():
             title=request.form.get(f'title.{i}'),
             track_number=int(request.form.get(f'track-number.{i}')),
             enabled=bool(request.form.get(f'enable.{i}')),
-            latest_download_event={}
         )
         album.tracks[request.form.get(f'id.{i}')] = track
     t = Thread(target=downloader.download_album, args=[album])
