@@ -56,7 +56,7 @@ def add_album(album):
 
 
 def get_updates_since(time_seconds):
-    return [album for album in albums if album.last_updated > time_seconds]
+    return [album for album in reversed(albums) if album.last_updated > time_seconds]
 
 
 def download_album(album: Album):

@@ -1,11 +1,12 @@
 <ul id="download-list" hx-swap-oob="true">
     {% for album in albums %}
         <li id="download-album-{{ album.id }}">
+        <img src="{{ album.thumbnailUrl }}" height="60px">
         {{ album.title }} by {{ album.artist }}
         <ul>
         {% for track in album.tracks %}
-            <li>
-                <p>{{ track.track_number }}. {{ track.title }}</p>
+            <li class="downloading-track">
+                <span>{{ track.track_number }}. {{ track.title }}</span>
             <progress value="{{ track.latest_download_event.downloaded_bytes }}"
                       max="{{ track.latest_download_event.total_bytes }}">
 

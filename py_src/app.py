@@ -77,10 +77,11 @@ def downloads(web_socket: simple_websocket.ws.Server):
     last_updated = 0
     while web_socket.connected:
         updated_albums = downloader.get_updates_since(last_updated)
-        web_socket.send(render_template(
-            "partials/downloading_album.html",
-            albums=updated_albums
-        ))
+        if len(updated_albums) > 0:
+            web_socket.send(render_template(
+                "partials/downloading_album.html",
+                albums=updated_albums
+            ))
         time.sleep(1)
 
 
