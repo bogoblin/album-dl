@@ -58,6 +58,7 @@ def download_album(album_options, track_options):
                 mp3 = MP3(file_path, ID3=EasyID3)
                 mp3['tracknumber'] = f'{track_number}/{total_tracks}'
                 mp3['albumartist'] = album_artist
+                mp3['album'] = album_name
                 mp3['artist'] = album_artist
                 mp3['date'] = f'{album_options["year"]}'
                 mp3['title'] = options_for_track['title']
