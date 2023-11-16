@@ -11,8 +11,6 @@ from tkinter.filedialog import askdirectory
 import downloader
 import webbrowser
 
-import progress_tracker
-
 app = Flask(__name__,
             static_url_path='',
             static_folder="static",
@@ -22,7 +20,6 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 sock = Sock(app)
 
-progress_tracker.app = app.app_context()
 
 @app.route("/", methods=['GET'])
 def index():
@@ -53,34 +50,37 @@ def get_album():
 
 @app.route("/download", methods=['POST'])
 def download():
-    track_options = []
+    album = downloader.Album(
+        audioPlaylistId=request.form.get("audioPlaylistId"),
+        thumbnailUrl=request.form.get("thumbnailUrl"),
+        artist=request.form.get("artist"),
+        title=request.form.get("title"),
+        year=int(request.form.get("year")),
+    )
     for i in range(1, 1000):
         if f'enable.{i}' not in request.form:
             break
-        track_options.append({
-            'enable': request.form.get(f'enable.{i}'),
-            'track-number': request.form.get(f'track-number.{i}'),
-            'title': request.form.get(f'title.{i}'),
-        })
-
-    t = Thread(target=downloader.download_album, args=(request.form, track_options))
+        track = downloader.Track(
+            title=request.form.get(f'title.{i}'),
+            track_number=int(request.form.get(f'track-number.{i}')),
+            enabled=bool(request.form.get(f'enable.{i}')),
+            latest_download_event={}
+        )
+        album.tracks[request.form.get(f'id.{i}')] = track
+    t = Thread(target=downloader.download_album, args=[album])
     t.start()
     return 'Downloading...'
 
 
 @sock.route('/downloads')
 def downloads(web_socket: simple_websocket.ws.Server):
-    next_event_index = 0
+    last_updated = 0
     while web_socket.connected:
-        if len(progress_tracker.events) < next_event_index:
-            continue
-        new_events = progress_tracker.events[next_event_index:]
-        next_event_index = len(progress_tracker.events)
-        for event in new_events:
-            web_socket.send(render_template(
-                "partials/download_event.html",
-                download_event='hello123'
-            ))
+        updated_albums = downloader.get_updates_since(last_updated)
+        web_socket.send(render_template(
+            "partials/downloading_album.html",
+            albums=updated_albums
+        ))
         time.sleep(1)
 
 

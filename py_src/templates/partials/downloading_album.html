@@ -1,0 +1,7 @@
+<ul id="download-list" hx-swap-oob="true">
+    {% for album in albums %}
+        <li id="download-album-{{ album.id }}">
+        {{ album.title }}
+        </li>
+    {% endfor %}
+</ul>
