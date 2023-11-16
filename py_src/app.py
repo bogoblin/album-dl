@@ -61,11 +61,12 @@ def download():
         if f'enable.{i}' not in request.form:
             break
         track = downloader.Track(
+            video_id=request.form.get(f'id.{i}'),
             title=request.form.get(f'title.{i}'),
             track_number=int(request.form.get(f'track-number.{i}')),
             enabled=bool(request.form.get(f'enable.{i}')),
         )
-        album.tracks[request.form.get(f'id.{i}')] = track
+        album.tracks.append(track)
     t = Thread(target=downloader.download_album, args=[album])
     t.start()
     return 'Downloading...'

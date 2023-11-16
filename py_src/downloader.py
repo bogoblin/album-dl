@@ -1,7 +1,6 @@
 import re
 import tempfile
 import time
-import typing
 from dataclasses import dataclass, field
 from yt_dlp import YoutubeDL
 import pathlib
@@ -16,6 +15,7 @@ MusicDirectory = ''
 
 @dataclass
 class Track:
+    video_id: str
     enabled: bool
     track_number: int
     title: str
@@ -29,17 +29,23 @@ class Album:
     title: str
     artist: str
     year: int
-    tracks: typing.Dict[str, Track] = field(default_factory=dict)
+    tracks: list = field(default_factory=list)
     last_updated: float = 0
 
     def process_event(self, download_event):
         video_id = download_event["info_dict"]["id"]
-        track = self.tracks.get(video_id)
-        if track:
-            track.latest_download_event = download_event
-            self.last_updated = time.time()
-        else:
-            pass
+        for track in self.tracks:
+            if track.video_id == video_id:
+                track.latest_download_event = download_event
+                self.last_updated = time.time()
+                return
+
+        for track in self.tracks:
+            if track.latest_download_event is None:
+                track.latest_download_event = download_event
+                track.video_id = video_id
+                self.last_updated = time.time()
+                return
 
 
 albums = []
@@ -91,9 +97,9 @@ def download_album(album: Album):
         info = ydl.extract_info(album.audioPlaylistId)
         total_tracks = len(info['entries'])
         for track, entry in zip(album.tracks, info['entries']):
-            track_number = int(track['track-number'])
+            track_number = int(track.track_number)
             for download in entry['requested_downloads']:
-                if not track['enable']:
+                if not track.enabled:
                     continue
                 file_path = download['filepath']
                 mp3 = MP3(file_path, ID3=EasyID3)
@@ -102,7 +108,7 @@ def download_album(album: Album):
                 mp3['album'] = album.title
                 mp3['artist'] = album.artist
                 mp3['date'] = f'{album.year}'
-                mp3['title'] = track['title']
+                mp3['title'] = track.title
                 mp3.save()
                 shutil.move(file_path, album_dir)
                 break
