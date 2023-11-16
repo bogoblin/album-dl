@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block query %}{{ query }}{% endblock %}
+{% block content %}
+    <h2>Showing {{ number_of_results }} results:</h2>
+    <ul id="search-results">
+        {% for album in search %}
+            <li hx-get="/album?browseId={{ album["browseId"] }}" hx-trigger="load"></li>
+        {% endfor %}
+    </ul>
+{% endblock %}

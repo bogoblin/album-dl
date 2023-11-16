@@ -17,18 +17,19 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 @app.route("/", methods=['GET'])
 def index():
-    return send_file("static/index.html")
+    return render_template("index.html")
 
 
 @app.route("/search", methods=['GET'])
 def search():
     query = request.args.get('query', '')
-    ytmusic = YTMusic()
-    search = ytmusic.search(query, 'albums')
-    output = f'<h2>Showing {len(search)} results:</h2>\n'
-    for album in search:
-        output += f'<li hx-get="/album?browseId={album["browseId"]}" hx-trigger="load"></li>'
-    return output
+    search = YTMusic().search(query, 'albums')
+    return render_template(
+        'search.html',
+        search=search,
+        number_of_results=len(search),
+        query=query
+    )
 
 
 @app.route("/album", methods=['GET'])

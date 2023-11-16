@@ -24,9 +24,9 @@
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
 
 <h1>Album stealer 5000</h1>
-<form hx-get="/search" hx-target="#search-results">
+<form action="/search" method="get">
     <label for="search-box">Search albums: </label>
-    <input id="search-box" name="query">
+    <input id="search-box" name="query" value="{% block query %}{% endblock %}">
     <button>Search</button>
 </form>
 <hr>
