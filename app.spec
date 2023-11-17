@@ -1,7 +1,7 @@
 # -*- mode: python ; coding: utf-8 -*-
 from PyInstaller.utils.hooks import collect_data_files
 
-datas = [('py_src\\static', 'static'), ('py_src\\templates', 'templates')]
+datas = [('py_src\\templates', 'templates')]
 datas += collect_data_files('ytmusicapi')
 
 
