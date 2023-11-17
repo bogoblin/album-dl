@@ -1,4 +1,8 @@
+import time
+
+import simple_websocket.ws
 from flask import Flask, request, send_file, render_template
+from flask_sock import Sock
 from ytmusicapi import YTMusic
 from threading import Thread
 from tkinter import Tk
@@ -13,6 +17,8 @@ app = Flask(__name__,
             template_folder="templates"
             )
 app.config["TEMPLATES_AUTO_RELOAD"] = True
+
+sock = Sock(app)
 
 
 @app.route("/", methods=['GET'])
@@ -44,19 +50,39 @@ def get_album():
 
 @app.route("/download", methods=['POST'])
 def download():
-    track_options = []
+    album = downloader.Album(
+        audioPlaylistId=request.form.get("audioPlaylistId"),
+        thumbnailUrl=request.form.get("thumbnailUrl"),
+        artist=request.form.get("artist"),
+        title=request.form.get("title"),
+        year=int(request.form.get("year")),
+    )
     for i in range(1, 1000):
         if f'enable.{i}' not in request.form:
             break
-        track_options.append({
-            'enable': request.form.get(f'enable.{i}'),
-            'track-number': request.form.get(f'track-number.{i}'),
-            'title': request.form.get(f'title.{i}'),
-        })
-
-    t = Thread(target=downloader.download_album, args=(request.form, track_options))
+        track = downloader.Track(
+            video_id=request.form.get(f'id.{i}'),
+            title=request.form.get(f'title.{i}'),
+            track_number=int(request.form.get(f'track-number.{i}')),
+            enabled=bool(request.form.get(f'enable.{i}')),
+        )
+        album.tracks.append(track)
+    t = Thread(target=downloader.download_album, args=[album])
     t.start()
     return 'Downloading...'
+
+
+@sock.route('/downloads')
+def downloads(web_socket: simple_websocket.ws.Server):
+    last_updated = 0
+    while web_socket.connected:
+        updated_albums = downloader.get_updates_since(last_updated)
+        if len(updated_albums) > 0:
+            web_socket.send(render_template(
+                "partials/downloading_album.html",
+                albums=updated_albums
+            ))
+        time.sleep(1)
 
 
 if __name__ == '__main__':

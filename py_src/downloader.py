@@ -1,5 +1,7 @@
 import re
 import tempfile
+import time
+from dataclasses import dataclass, field
 from yt_dlp import YoutubeDL
 import pathlib
 import requests
@@ -11,10 +13,53 @@ from mutagen.easyid3 import EasyID3
 MusicDirectory = ''
 
 
-def download_album(album_options, track_options):
-    album_artist = album_options['artist']
-    album_name = album_options['title']
+@dataclass
+class Track:
+    video_id: str
+    enabled: bool
+    track_number: int
+    title: str
+    latest_download_event: dict | None = None
 
+
+@dataclass
+class Album:
+    audioPlaylistId: str
+    thumbnailUrl: str
+    title: str
+    artist: str
+    year: int
+    tracks: list = field(default_factory=list)
+    last_updated: float = 0
+
+    def process_event(self, download_event):
+        video_id = download_event["info_dict"]["id"]
+        for track in self.tracks:
+            if track.video_id == video_id:
+                track.latest_download_event = download_event
+                self.last_updated = time.time()
+                return
+
+        for track in self.tracks:
+            if track.latest_download_event is None:
+                track.latest_download_event = download_event
+                track.video_id = video_id
+                self.last_updated = time.time()
+                return
+
+
+albums = []
+
+
+def add_album(album):
+    albums.append(album)
+
+
+def get_updates_since(time_seconds):
+    return [album for album in reversed(albums) if album.last_updated > time_seconds]
+
+
+def download_album(album: Album):
     # We create a temporary directory to work in, otherwise
     # foobar2000 can start reading the files:
     temp_dir = tempfile.mkdtemp()
@@ -22,15 +67,17 @@ def download_album(album_options, track_options):
     # Create output directory:
     music_dir = pathlib.Path(MusicDirectory)
     album_dir = (music_dir
-                 / sanitize_path_segment(album_artist)
-                 / sanitize_path_segment(album_name)
+                 / sanitize_path_segment(album.artist)
+                 / sanitize_path_segment(album.title)
                  )
     os.makedirs(album_dir, 0o777, True)
 
-    thumbnail_response = requests.get(album_options['thumbnailUrl'], stream=True)
+    thumbnail_response = requests.get(album.thumbnailUrl, stream=True)
     if thumbnail_response.status_code == 200:
         with open(album_dir / 'cover.jpg', 'wb') as f:
             shutil.copyfileobj(thumbnail_response.raw, f)
+
+    add_album(album)
 
     with YoutubeDL({
         'paths': {
@@ -45,23 +92,23 @@ def download_album(album_options, track_options):
                 'preferredcodec': 'mp3',
             }
         ],
-        # 'keepvideo': True
+        'progress_hooks': [lambda event: album.process_event(event)]
     }) as ydl:
-        info = ydl.extract_info(album_options['audioPlaylistId'])
+        info = ydl.extract_info(album.audioPlaylistId)
         total_tracks = len(info['entries'])
-        for options_for_track, entry in zip(track_options, info['entries']):
-            track_number = int(options_for_track['track-number'])
+        for track, entry in zip(album.tracks, info['entries']):
+            track_number = int(track.track_number)
             for download in entry['requested_downloads']:
-                if not options_for_track['enable']:
+                if not track.enabled:
                     continue
                 file_path = download['filepath']
                 mp3 = MP3(file_path, ID3=EasyID3)
                 mp3['tracknumber'] = f'{track_number}/{total_tracks}'
-                mp3['albumartist'] = album_artist
-                mp3['album'] = album_name
-                mp3['artist'] = album_artist
-                mp3['date'] = f'{album_options["year"]}'
-                mp3['title'] = options_for_track['title']
+                mp3['albumartist'] = album.artist
+                mp3['album'] = album.title
+                mp3['artist'] = album.artist
+                mp3['date'] = f'{album.year}'
+                mp3['title'] = track.title
                 mp3.save()
                 shutil.move(file_path, album_dir)
                 break

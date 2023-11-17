@@ -9,6 +9,7 @@
         background-color: #333333;
         color: #ff7581;
         font-family: Verdana,sans-serif;
+        overflow-y: hidden;
     }
 
     .album {
@@ -19,18 +20,44 @@
     li {
         list-style: none;
     }
+
+    .downloading-track {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        font-size: small;
+        gap: 3px;
+    }
+
+    .column {
+        height: calc(100vh - 10px);
+        overflow-y: scroll;
+    }
 </style>
 <body>
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
+<script src="https://unpkg.com/htmx.org/dist/ext/ws.js"></script>
 
-<h1>Album stealer 5000</h1>
-<form action="/search" method="get">
-    <label for="search-box">Search albums: </label>
-    <input id="search-box" name="query" value="{% block query %}{% endblock %}">
-    <button>Search</button>
-</form>
-<hr>
-{% block content %}
-{% endblock %}
+<div style="display: flex; justify-content: space-between">
+<div class="column" style="flex-grow: 1">
+    <h1>Album stealer 5000</h1>
+    <form action="/search" method="get">
+        <label for="search-box">Search albums: </label>
+        <input id="search-box" name="query" value="{% block query %}{% endblock %}">
+        <button>Search</button>
+    </form>
+    <hr>
+    <div id="main">
+        {% block content %}
+        {% endblock %}
+    </div>
+</div>
+<div class="column" style="max-width: 35%">
+    <h2>Downloads:</h2>
+    <div id="downloads" hx-ext="ws" ws-connect="/downloads">
+        <ul id="download-list"></ul>
+    </div>
+</div>
+</div>
 </body>
 </html>
