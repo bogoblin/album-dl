@@ -7,10 +7,12 @@
             <input type="hidden" name="thumbnailUrl" value="{{ album.thumbnails[-1].url }}">
             <input type="text" name="title" value="{{ album.title }}">
             by
-            <input type="text" name="artist" value="{{ album.artists[0].name }}">
-            {% if context != 'artist' %}
-                <a href="/artist?id={{ album.artists[0].id }}">Go to Artist</a>
-            {% endif %}
+            <span class="artist-form-box">
+                <input type="text" name="artist" value="{{ album.artists[0].name }}">
+                {% if context != 'artist' %}
+                    <a href="/artist?id={{ album.artists[0].id }}">🧑</a>
+                {% endif %}
+           </span>
             <input type="text" name="year" value="{{ album.year }}" size="4">
             <button type="submit">Download</button>
             <details open>
