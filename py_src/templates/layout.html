@@ -74,6 +74,27 @@
         text-decoration: none;
         text-shadow: var(--accent) 0 0 5px;
     }
+
+    #downloads-column {
+        padding: 0;
+        margin: 0;
+        overflow: hidden;
+        min-width: 1.5em;
+    }
+
+    #downloads-column[open] {
+        overflow-y: scroll;
+    }
+
+    #downloads-column summary {
+        writing-mode: vertical-lr;
+        height: 100%;
+    }
+
+    #downloads-column[open] summary {
+        writing-mode: unset;
+        height: unset;
+    }
 </style>
 <body>
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
@@ -93,12 +114,12 @@
         {% endblock %}
     </div>
 </div>
-<div class="column" style="max-width: 35%">
-    <h2>Downloads:</h2>
+<details id="downloads-column" class="column" style="max-width: 35%">
+    <summary>Downloads:</summary>
     <div id="downloads" hx-ext="ws" ws-connect="/downloads">
         <ul id="download-list"></ul>
     </div>
-</div>
+</details>
 </div>
 </body>
 </html>
