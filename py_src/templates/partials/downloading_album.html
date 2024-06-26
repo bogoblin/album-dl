@@ -1,8 +1,8 @@
 <ul id="download-list" hx-swap-oob="true">
     {% for album in albums %}
-        <li id="download-album-{{ album.id }}">
-        <img src="{{ album.thumbnailUrl }}" height="60px">
-        {{ album.title }} by {{ album.artist }}
+        <li id="download-album-{{ album.id }}" style="background-image: url('{{ album.thumbnailUrl }}'); background-size: cover;">
+        <div class="downloading-text">
+            <h2>{{ album.title }} by {{ album.artist }}</h2>
         <ul>
         {% for track in album.tracks %}
             <li class="downloading-track">
@@ -14,6 +14,7 @@
             </li>
         {% endfor %}
         </ul>
+        </div>
         </li>
     {% endfor %}
 </ul>

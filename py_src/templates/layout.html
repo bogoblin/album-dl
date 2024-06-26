@@ -8,7 +8,7 @@
 <style>
     .album {
         display: grid;
-        grid-template-columns: 20vh max-content;
+        grid-template-columns: minmax(10vh, 20vh) max-content;
         grid-gap: 1em;
     }
 
@@ -26,6 +26,15 @@
         justify-content: space-between;
         font-size: small;
         gap: 3px;
+    }
+
+    .downloading-text {
+        background-color: color-mix(in srgb, var(--bg), #0000 50%);
+        padding: 1em;
+    }
+
+    #download-list {
+        padding: 0;
     }
 
     .column {
