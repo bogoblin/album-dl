@@ -17,7 +17,7 @@
                 <summary>{{ album.trackCount }} Tracks</summary>
                 <ul>
                     {% for track in album.tracks %}
-                        <li>
+                        <li class="track">
                             <input type="hidden" name="id.{{ loop.index }}" value="{{ track.videoId }}">
                             <input type="checkbox" name="enable.{{ loop.index }}" checked>
                             <input type="text" name="track-number.{{ loop.index }}" value="{{ loop.index }}" size="3" style="text-align: right">
