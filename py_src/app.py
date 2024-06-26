@@ -1,15 +1,15 @@
 import time
-
-import simple_websocket.ws
-from flask import Flask, request, send_file, render_template
-from flask_sock import Sock
-from ytmusicapi import YTMusic
+import webbrowser
 from threading import Thread
 from tkinter import Tk
 from tkinter.filedialog import askdirectory
 
+import simple_websocket.ws
+from flask import Flask, request, render_template
+from flask_sock import Sock
+from ytmusicapi import YTMusic
+
 import downloader
-import webbrowser
 
 app = Flask(__name__,
             static_url_path='',
