@@ -1,8 +1,6 @@
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
 <article class="album">
-    <figure>
-        <img src="{{ album.thumbnails[-1].url }}" alt="album art" height="200">
-    </figure>
+    <img src="{{ album.thumbnails[-1].url }}" class="album-art" alt="album art">
     <div>
         <form hx-post="/download">
             <input type="hidden" name="audioPlaylistId" value="{{ album.audioPlaylistId }}">

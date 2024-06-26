@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <title>Album Stealer 5000</title>
+    <link rel="stylesheet" href="https://unpkg.com/missing.css@1.1.2">
 </head>
 <style>
-    body {
-        background-color: #333333;
-        color: #ff7581;
-        font-family: Verdana,sans-serif;
-        overflow-y: hidden;
-        padding: 0;
-        margin: 0;
-    }
-
     .album {
         display: grid;
-        grid-template-columns: auto 1fr;
+        grid-template-columns: 20vh max-content;
+        grid-gap: 1em;
+    }
+
+    .album-art {
+        max-height: 20vh;
     }
 
     li {
@@ -34,6 +31,10 @@
     .column {
         height: 100vh;
         overflow-y: scroll;
+    }
+
+    input {
+        display: inline;
     }
 </style>
 <body>
