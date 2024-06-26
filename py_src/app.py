@@ -38,6 +38,19 @@ def search():
     )
 
 
+@app.route("/artist", methods=['GET'])
+def get_artist():
+    id = request.args.get('id', '')
+    artist = YTMusic().get_artist(id)
+    if request.accept_mimetypes.accept_html:
+        return render_template(
+            'artist.html',
+            artist=artist
+        )
+
+    return artist
+
+
 @app.route("/album", methods=['GET'])
 def get_album():
     browse_id = request.args.get('browseId', '')

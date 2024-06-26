@@ -10,6 +10,7 @@
             <input type="text" name="title" value="{{ album.title }}">
             by
             <input type="text" name="artist" value="{{ album.artists[0].name }}">
+            <a href="/artist?id={{ album.artists[0].id }}">Go to Artist</a>
             <input type="text" name="year" value="{{ album.year }}">
             <button type="submit">Download</button>
             <details open>
