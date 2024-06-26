@@ -54,9 +54,10 @@ def get_artist():
 @app.route("/album", methods=['GET'])
 def get_album():
     browse_id = request.args.get('browseId', '')
+    context = request.args.get('context', '')
     album = YTMusic().get_album(browse_id)
     if request.accept_mimetypes.accept_html:
-        return render_template('album.html', album=album)
+        return render_template('album.html', album=album, context=context)
 
     return album
 
