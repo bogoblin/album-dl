@@ -7,10 +7,13 @@
         {% for track in album.tracks %}
             <li class="downloading-track">
                 <span>{{ track.track_number }}. {{ track.title }}</span>
+                {% if track.latest_download_event.downloaded_bytes < track.latest_download_event.total_bytes %}
             <progress value="{{ track.latest_download_event.downloaded_bytes }}"
                       max="{{ track.latest_download_event.total_bytes }}">
-
             </progress>
+            {% else %}
+                    <span>✔️</span>
+            {% endif %}
             </li>
         {% endfor %}
         </ul>
