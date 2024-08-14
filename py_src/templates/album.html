@@ -28,6 +28,11 @@
                         </li>
                     {% endfor %}
                 </ul>
+                <label>
+                    <input type="checkbox" name="removeSuffix">
+                    Remove suffix:
+                    <input type="text" name="suffix" value="{{ album.commonSuffix }}">
+                </label>
             </details>
             <br>
         </form>

@@ -10,6 +10,7 @@ from flask_sock import Sock
 from ytmusicapi import YTMusic
 
 import downloader
+from py_src.suffixes import best_suffix
 
 app = Flask(__name__,
             static_url_path='',
@@ -56,6 +57,9 @@ def get_album():
     browse_id = request.args.get('browseId', '')
     context = request.args.get('context', '')
     album = YTMusic().get_album(browse_id)
+    track_titles = [track['title'] for track in album['tracks']]
+    best_common_suffix = best_suffix(track_titles)
+    album['commonSuffix'] = best_common_suffix
     if request.accept_mimetypes.accept_html:
         return render_template('album.html', album=album, context=context)
 
@@ -71,12 +75,13 @@ def download():
         title=request.form.get("title"),
         year=int(request.form.get("year")),
     )
+    remove_suffix = request.form.get("suffix") if request.form.get("removeSuffix") else ''
     for i in range(1, 1000):
         if f'enable.{i}' not in request.form:
             break
         track = downloader.Track(
             video_id=request.form.get(f'id.{i}'),
-            title=request.form.get(f'title.{i}'),
+            title=request.form.get(f'title.{i}').removesuffix(remove_suffix),
             track_number=int(request.form.get(f'track-number.{i}')),
             enabled=bool(request.form.get(f'enable.{i}')),
         )
