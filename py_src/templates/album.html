@@ -1,40 +1,50 @@
 <script src="https://unpkg.com/htmx.org@1.9.6"></script>
-<article class="album">
-    <img src="{{ album.thumbnails[-1].url }}" class="album-art" alt="album art">
+<form class="album" hx-post="/download">
     <div>
-        <form hx-post="/download">
-            <input type="hidden" name="audioPlaylistId" value="{{ album.audioPlaylistId }}">
-            <input type="hidden" name="thumbnailUrl" value="{{ album.thumbnails[-1].url }}">
-            <input type="text" name="title" value="{{ album.title }}">
-            by
-            <span class="artist-form-box">
-                <input type="text" name="artist" value="{{ album.artists[0].name }}">
-                {% if context != 'artist' %}
-                    <a href="/artist?id={{ album.artists[0].id }}">🧑</a>
-                {% endif %}
-           </span>
-            <input type="text" name="year" value="{{ album.year }}" size="4">
-            <button type="submit">Download</button>
-            <details open>
-                <summary>{{ album.trackCount }} Tracks</summary>
-                <ul>
-                    {% for track in album.tracks %}
-                        <li class="track">
-                            <input type="hidden" name="id.{{ loop.index }}" value="{{ track.videoId }}">
-                            <input type="checkbox" name="enable.{{ loop.index }}" checked>
-                            <input type="text" name="track-number.{{ loop.index }}" value="{{ loop.index }}" size="3" style="text-align: right">
-                            <input type="text" name="title.{{ loop.index }}" value="{{ track.title }}" size="30">
-                            <span>{{ track.duration }}</span>
-                        </li>
-                    {% endfor %}
-                </ul>
-                <label>
-                    <input type="checkbox" name="removeSuffix">
-                    Remove suffix:
-                    <input type="text" name="suffix" value="{{ album.commonSuffix }}">
-                </label>
-            </details>
-            <br>
-        </form>
+        {# This bit allows the user to change the album art #}
+        <img src="{{ album.thumbnails[-1].url }}" class="album-art" alt="album art" id="{{ album.audioPlaylistId }}.img">
+        <input type="text" name="thumbnailUrl" value="{{ album.thumbnails[-1].url }}" style="width: 100%; margin-top: 0.5em" id="{{ album.audioPlaylistId }}.imgSrc">
+        <script>
+            document
+                .getElementById("{{ album.audioPlaylistId }}.imgSrc")
+                .addEventListener('change', (e) => {
+                    document
+                        .getElementById("{{ album.audioPlaylistId }}.img")
+                        .src = e.target.value;
+                })
+        </script>
     </div>
-</article>
+    <div>
+        <input type="hidden" name="audioPlaylistId" value="{{ album.audioPlaylistId }}">
+        <input type="text" name="title" value="{{ album.title }}">
+        by
+        <span class="artist-form-box">
+                <input type="text" name="artist" value="{{ album.artists[0].name }}">
+            {% if context != 'artist' %}
+                <a href="/artist?id={{ album.artists[0].id }}">🧑</a>
+            {% endif %}
+           </span>
+        <input type="text" name="year" value="{{ album.year }}" size="4">
+        <button type="submit">Download</button>
+        <details open>
+            <summary>{{ album.trackCount }} Tracks</summary>
+            <ul>
+                {% for track in album.tracks %}
+                    <li class="track">
+                        <input type="hidden" name="id.{{ loop.index }}" value="{{ track.videoId }}">
+                        <input type="checkbox" name="enable.{{ loop.index }}" checked>
+                        <input type="text" name="track-number.{{ loop.index }}" value="{{ loop.index }}" size="3" style="text-align: right">
+                        <input type="text" name="title.{{ loop.index }}" value="{{ track.title }}" size="30">
+                        <span>{{ track.duration }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+            <label>
+                <input type="checkbox" name="removeSuffix">
+                Remove suffix:
+                <input type="text" name="suffix" value="{{ album.commonSuffix }}">
+            </label>
+        </details>
+        <br>
+    </div>
+</form>
