@@ -88,7 +88,7 @@ def download():
         album.tracks.append(track)
     t = Thread(target=downloader.download_album, args=[album])
     t.start()
-    return 'Downloading...'
+    return render_template("downloading.html", album=album)
 
 
 @sock.route('/downloads')

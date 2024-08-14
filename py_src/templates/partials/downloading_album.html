@@ -1,31 +1,31 @@
-<ul id="download-list" hx-swap-oob="true">
+<ul id="download-list">
     {% for album in albums %}
-        <li id="download-album-{{ album.id }}" style="background-image: url('{{ album.thumbnailUrl }}'); background-size: cover;">
-        <div class="downloading-text">
-            {% if album.finished %}
-                <h2>✔️ {{ album.title }}</h2>
-                <h3>{{ album.artist }}</h3>
-            {% else %}
-            <h2>{{ album.title }}</h2>
-            <h3>{{ album.artist }}</h3>
-        <ul class="downloading-tracks">
-        {% for track in album.tracks %}
-            <li class="downloading-track">
-                <span>{{ track.track_number }}. {{ track.title }}</span>
-            {% if track.latest_download_event %}
-                {% if track.latest_download_event.downloaded_bytes < track.latest_download_event.total_bytes %}
-                    <progress value="{{ track.latest_download_event.downloaded_bytes }}"
-                              max="{{ track.latest_download_event.total_bytes }}">
-                    </progress>
-                {% else %}
-                    <span>✔️</span>
-                {% endif %}
-            {% endif %}
-            </li>
-        {% endfor %}
-        {% endif %}
-        </ul>
-        </div>
+        <li id="download-album-{{ album.audioPlaylistId }}" style="background-image: url('{{ album.thumbnailUrl }}'); background-size: cover;">
+            <div class="downloading-text">
+{#                {% if album.finished %}#}
+{#                    <h2>✔️ {{ album.title }}</h2>#}
+{#                    <h3>{{ album.artist }}</h3>#}
+{#                {% else %}#}
+                    <h2>{{ album.title }}</h2>
+                    <h3>{{ album.artist }}</h3>
+                    <ul class="downloading-tracks">
+                    {% for track in album.tracks %}
+                        <li class="downloading-track">
+                            <span>{{ track.track_number }}. {{ track.title }}</span>
+                            {% if track.latest_download_event %}
+                                {% if track.latest_download_event.downloaded_bytes < track.latest_download_event.total_bytes %}
+                                    <progress value="{{ track.latest_download_event.downloaded_bytes }}"
+                                              max="{{ track.latest_download_event.total_bytes }}">
+                                    </progress>
+                                {% else %}
+                                    <span>✔️</span>
+                                {% endif %}
+                            {% endif %}
+                        </li>
+                    {% endfor %}
+{#                {% endif %}#}
+                </ul>
+            </div>
         </li>
     {% endfor %}
 </ul>
