@@ -33,6 +33,7 @@ class Album:
     year: int
     tracks: list = field(default_factory=list)
     last_updated: float = 0
+    finished: bool = False
 
     def process_event(self, download_event):
         video_id = download_event["info_dict"]["id"]
@@ -92,6 +93,8 @@ def download_album(album: Album):
 
     print(f'Downloaded album to {temp_dir}')
     shutil.copytree(temp_dir, album_dir, dirs_exist_ok=True)
+    album.finished = True
+    album.last_updated = time.time()
 
 
 def download_track(album: Album, track: Track, track_index: int, temp_dir: pathlib.Path):

@@ -101,6 +101,7 @@ def downloads(web_socket: simple_websocket.ws.Server):
                 "partials/downloading_album.html",
                 albums=updated_albums
             ))
+        last_updated = time.time()
         time.sleep(1)
 
 

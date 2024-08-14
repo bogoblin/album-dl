@@ -7,4 +7,7 @@ def best_suffix(strings: list[str]):
             suffixes[suffix] = current_count + 1
 
     suffix_scores = {suffix: len(suffix) * count for suffix, count in suffixes.items() if count > 1}
-    return max(suffix_scores, key=suffix_scores.get)
+    try:
+        return max(suffix_scores, key=suffix_scores.get)
+    except ValueError:
+        return ''
