@@ -2,6 +2,8 @@ import re
 import tempfile
 import time
 from dataclasses import dataclass, field
+from threading import Thread
+
 from yt_dlp import YoutubeDL
 import pathlib
 import requests
@@ -62,7 +64,7 @@ def get_updates_since(time_seconds):
 def download_album(album: Album):
     # We create a temporary directory to work in, otherwise
     # foobar2000 can start reading the files:
-    temp_dir = tempfile.mkdtemp()
+    temp_dir = pathlib.Path(tempfile.mkdtemp())
 
     # Create output directory:
     music_dir = pathlib.Path(MusicDirectory)
@@ -74,10 +76,27 @@ def download_album(album: Album):
 
     thumbnail_response = requests.get(album.thumbnailUrl, stream=True)
     if thumbnail_response.status_code == 200:
-        with open(album_dir / 'cover.jpg', 'wb') as f:
+        with open(temp_dir / 'cover.jpg', 'wb') as f:
             shutil.copyfileobj(thumbnail_response.raw, f)
 
     add_album(album)
+
+    threads = [
+        Thread(target=download_track, args=[album, track, track_index, temp_dir])
+        for track_index, track in enumerate(album.tracks)
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join()
+
+    print(f'Downloaded album to {temp_dir}')
+    shutil.copytree(temp_dir, album_dir, dirs_exist_ok=True)
+
+
+def download_track(album: Album, track: Track, track_index: int, temp_dir: pathlib.Path):
+    if not track.enabled:
+        return
 
     with YoutubeDL({
         'paths': {
@@ -92,29 +111,23 @@ def download_album(album: Album):
                 'preferredcodec': 'mp3',
             }
         ],
+        'playlist_items': f'{track_index+1}',
         'progress_hooks': [lambda event: album.process_event(event)]
     }) as ydl:
         info = ydl.extract_info(album.audioPlaylistId)
-        total_tracks = len(info['entries'])
-        for track, entry in zip(album.tracks, info['entries']):
-            track_number = int(track.track_number)
-            for download in entry['requested_downloads']:
-                if not track.enabled:
-                    continue
-                file_path = download['filepath']
-                mp3 = MP3(file_path, ID3=EasyID3)
-                mp3['tracknumber'] = f'{track_number}/{total_tracks}'
-                mp3['albumartist'] = album.artist
-                mp3['album'] = album.title
-                mp3['artist'] = album.artist
-                mp3['date'] = f'{album.year}'
-                mp3['title'] = track.title
-                mp3.save()
-                shutil.move(file_path, album_dir)
-                break
-
-        print(f'Downloaded album to {album_dir}')
-        return info
+        entry = info['entries'][0]
+        track_number = int(track.track_number)
+        for download in entry['requested_downloads']:
+            file_path = download['filepath']
+            mp3 = MP3(file_path, ID3=EasyID3)
+            mp3['tracknumber'] = f'{track_number}/{len(album.tracks)}'
+            mp3['albumartist'] = album.artist
+            mp3['album'] = album.title
+            mp3['artist'] = album.artist
+            mp3['date'] = f'{album.year}'
+            mp3['title'] = track.title
+            mp3.save()
+            break
 
 
 def sanitize_path_segment(path_segment: str):
