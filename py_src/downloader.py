@@ -135,4 +135,5 @@ def download_track(album: Album, track: Track, track_index: int, temp_dir: pathl
 
 def sanitize_path_segment(path_segment: str):
     not_allowed_in_path = re.compile(r"[:\\/<>\"|?*]")
-    return not_allowed_in_path.sub(' ', path_segment)
+    p = not_allowed_in_path.sub(' ', path_segment)
+    return p.strip(" ")
