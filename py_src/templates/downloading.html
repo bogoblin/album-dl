@@ -3,8 +3,8 @@
     <img src="{{ album.thumbnailUrl }}" class="album-art" alt="album art">
 </div>
 <div>
-    <h2>{{ album.title }}</h2>
-    <h3>{{ album.artist }} ({{ album.year }})</h3>
-    <p>Downloading...</p>
+    <div hx-ext="ws" ws-connect="/downloads/{{ album.audioPlaylistId }}">
+        <div id="download-album-inline-{{ album.audioPlaylistId }}"></div>
+    </div>
 </div>
 <br>

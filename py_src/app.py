@@ -10,6 +10,7 @@ from flask_sock import Sock
 from ytmusicapi import YTMusic
 
 import downloader
+from py_src.downloader import albumsByPlaylistId
 from py_src.suffixes import best_suffix
 
 app = Flask(__name__,
@@ -95,6 +96,20 @@ def download():
     return render_template("downloading.html", album=album)
 
 
+@sock.route('/downloads/<audioPlaylistId>')
+def single_download(web_socket: simple_websocket.ws.Server, audioPlaylistId: str):
+    last_updated = 0
+    while web_socket.connected:
+        album = downloader.albumsByPlaylistId[audioPlaylistId]
+        if album.last_updated >= last_updated:
+            web_socket.send(render_template(
+                "partials/download_album.html",
+                album=album
+            ))
+            last_updated = time.time()
+        time.sleep(1)
+
+
 @sock.route('/downloads')
 def downloads(web_socket: simple_websocket.ws.Server):
     last_updated = 0
@@ -102,7 +117,7 @@ def downloads(web_socket: simple_websocket.ws.Server):
         updated_albums = downloader.get_updates_since(last_updated)
         if len(updated_albums) > 0:
             web_socket.send(render_template(
-                "partials/downloading_album.html",
+                "partials/download_list.html",
                 albums=updated_albums
             ))
         last_updated = time.time()

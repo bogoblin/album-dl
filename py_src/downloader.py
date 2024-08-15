@@ -32,7 +32,7 @@ class Album:
     artist: str
     year: int
     tracks: list = field(default_factory=list)
-    last_updated: float = 0
+    last_updated: float = field(default_factory=time.time)
     finished: bool = False
 
     def process_event(self, download_event):
@@ -52,17 +52,21 @@ class Album:
 
 
 albums = []
+albumsByPlaylistId = dict()
 
 
 def add_album(album):
     albums.append(album)
+    albumsByPlaylistId[album.audioPlaylistId] = album
 
 
 def get_updates_since(time_seconds):
-    return [album for album in reversed(albums) if album.last_updated > time_seconds]
+    return [album for album in reversed(albums) if album.last_updated >= time_seconds]
 
 
 def download_album(album: Album):
+    add_album(album)
+
     # We create a temporary directory to work in, otherwise
     # foobar2000 can start reading the files:
     temp_dir = pathlib.Path(tempfile.mkdtemp())
@@ -75,19 +79,18 @@ def download_album(album: Album):
                  )
     os.makedirs(album_dir, 0o777, True)
 
-    thumbnail_response = requests.get(album.thumbnailUrl, stream=True)
-    if thumbnail_response.status_code == 200:
-        with open(temp_dir / 'cover.jpg', 'wb') as f:
-            shutil.copyfileobj(thumbnail_response.raw, f)
-
-    add_album(album)
-
     threads = [
         Thread(target=download_track, args=[album, track, track_index, temp_dir])
         for track_index, track in enumerate(album.tracks)
     ]
     for thread in threads:
         thread.start()
+
+    thumbnail_response = requests.get(album.thumbnailUrl, stream=True)
+    if thumbnail_response.status_code == 200:
+        with open(temp_dir / 'cover.jpg', 'wb') as f:
+            shutil.copyfileobj(thumbnail_response.raw, f)
+
     for thread in threads:
         thread.join()
 
@@ -134,6 +137,6 @@ def download_track(album: Album, track: Track, track_index: int, temp_dir: pathl
 
 
 def sanitize_path_segment(path_segment: str):
-    not_allowed_in_path = re.compile(r"[:\\/<>\"|?*]")
+    not_allowed_in_path = re.compile(r"[:\\/<>\"|?*.]")
     p = not_allowed_in_path.sub(' ', path_segment)
     return p.strip(" ")

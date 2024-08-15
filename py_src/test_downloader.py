@@ -9,3 +9,7 @@ class Test(TestCase):
             sanitize_path_segment("Are You Gonna Eat That?"),
             "Are You Gonna Eat That"
         )
+        self.assertEqual(
+            sanitize_path_segment("In Times New Roman..."),
+            "In Times New Roman"
+        )

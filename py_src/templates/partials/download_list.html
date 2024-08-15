@@ -2,13 +2,13 @@
     {% for album in albums %}
         <li id="download-album-{{ album.audioPlaylistId }}" style="background-image: url('{{ album.thumbnailUrl }}'); background-size: cover;">
             <div class="downloading-text">
-{#                {% if album.finished %}#}
-{#                    <h2>✔️ {{ album.title }}</h2>#}
-{#                    <h3>{{ album.artist }}</h3>#}
-{#                {% else %}#}
-                    <h2>{{ album.title }}</h2>
-                    <h3>{{ album.artist }}</h3>
-                    <ul class="downloading-tracks">
+                <h2>
+                    {% if album.finished %}✔️{% endif %}
+                    {{ album.title }}
+                </h2>
+                <h3>{{ album.artist }}</h3>
+                {% if not album.finished %}
+                <ul class="downloading-tracks">
                     {% for track in album.tracks %}
                         <li class="downloading-track">
                             <span>{{ track.track_number }}. {{ track.title }}</span>
@@ -23,8 +23,8 @@
                             {% endif %}
                         </li>
                     {% endfor %}
-{#                {% endif %}#}
                 </ul>
+                {% endif %}
             </div>
         </li>
     {% endfor %}
