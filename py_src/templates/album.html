@@ -53,3 +53,8 @@
         <br>
     </div>
 </form>
+{% if hide_other_versions == 0 and album.other_versions %}
+    {% for version in album.other_versions %}
+        <li hx-get="/album?browseId={{ version["browseId"] }}&hide_other_versions=1" hx-trigger="load"></li>
+    {% endfor %}
+{% endif %}

@@ -61,7 +61,11 @@ def get_album():
     best_common_suffix = best_suffix(track_titles)
     album['commonSuffix'] = best_common_suffix
     if request.accept_mimetypes.accept_html:
-        return render_template('album.html', album=album, context=context)
+        return render_template(
+            'album.html',
+            album=album, context=context,
+            hide_other_versions=request.args.get('hide_other_versions', 0)
+        )
 
     return album
 
